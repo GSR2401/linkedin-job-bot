@@ -1,0 +1,180 @@
+\documentclass[letterpaper,10pt]{report}
+
+\usepackage{latexsym}
+\usepackage[empty]{fullpage}
+\usepackage{titlesec}
+\usepackage{marvosym}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{verbatim}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{fancyhdr}
+\usepackage[english]{babel}
+\usepackage{tabularx}
+\usepackage{fontawesome5}
+\usepackage{multicol}
+\usepackage[hidelinks]{hyperref} 
+
+\setlength{\multicolsep}{-3.0pt}
+\setlength{\columnsep}{-1pt}
+\input{glyphtounicode}
+
+\definecolor{colorOption}{RGB}{0, 0, 0}
+
+\pagestyle{fancy}
+\fancyhf{} 
+\fancyfoot{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+\usepackage[top=0.15in, bottom=0.0in, left=0.3in, right=0.5in]{geometry}
+
+\urlstyle{same}
+
+\raggedbottom
+\raggedright
+\setlength{\tabcolsep}{0in}
+
+\titleformat{\section}{
+  \vspace{-4pt}\scshape\raggedright\bfseries\color{colorOption}
+}{}{0em}{}[\color{black}\titlerule \vspace{-5pt}]
+
+\pdfgentounicode=1
+
+\newcommand{\resumeItem}[1]{
+  \item\normalsize{
+    {#1 \vspace{-2pt}}
+  }
+}
+
+\newcommand{\resumeSubheading}[4]{
+  \vspace{-1pt}\item
+    \begin{tabular*}{1.001\textwidth}[t]{l@{\extracolsep{\fill}}r}
+      \textbf{#1} & \textit{\normalsize #2} \\
+      \textit{\normalsize #3} & \textit{\normalsize #4} \\
+    \end{tabular*}
+}
+
+\newcommand{\resumeSubheadingExp}[2]{
+  \vspace{-1pt}\item
+    \begin{tabular*}{1.001\textwidth}[t]{l@{\extracolsep{\fill}}r}
+      \textbf{#1} & \textit{\normalsize #2} \\
+    \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\resumeSubItem}[1]{\resumeItem{#1}\vspace{-4pt}}
+
+\renewcommand\labelitemi{$\vcenter{\hbox{\tiny$\bullet$}}$}
+\renewcommand\labelitemii{$\vcenter{\hbox{\tiny$\bullet$}}$}
+
+\newcommand{\resumeSubHeadingListStart}{\begin{itemize}[leftmargin=0.0in, label={}]}
+\newcommand{\resumeSubHeadingListEnd}{\end{itemize}}
+\newcommand{\resumeItemListStart}{\begin{itemize}}
+\newcommand{\resumeItemListEnd}{\end{itemize}\vspace{-18pt}}
+
+\begin{document}
+
+%-------------HEADER-----------
+\begin{center}
+{\Huge \scshape \color{colorOption} Shreyas Reddy Gaddampally} \\ \vspace{2pt}
+\normalsize
+
+\textbf{\raisebox{-0.05ex}{\faPhone} (934)255-9364} $|$
+\textbf{\raisebox{-0.05ex}{\faEnvelope} \href{mailto:shreyasreddy.gaddampally@gmail.com}{shreyasreddy.gaddampally@gmail.com}} $|$
+\textbf{\raisebox{-0.05ex}{\faLinkedin}
+\href{https://www.linkedin.com/in/shreyasreddy-gaddampally/}{LinkedIn}} $|$
+\textbf{\raisebox{-0.05ex}{\faGithub}
+\href{https://github.com/GSR2401}{GitHub}}
+\end{center}
+
+%-----------EDUCATION-----------
+\section{\color{colorOption} EDUCATION}
+  \resumeSubHeadingListStart
+    \resumeSubheading
+      {Stony Brook University}{Aug 2024 - May 2026}
+      {Master of Science in Computer Science}{Stony Brook, NY}
+\ Distributed Systems, Database Systems, Machine Learning, Generative AI, Operating Systems \\
+Graduate Teaching Assistant: CSE 581 -- Computer Science Fundamentals
+      
+      \vspace{-10pt}
+      
+  \resumeSubHeadingListEnd
+
+
+%-----------EXPERIENCE-----------
+\section{\color{colorOption} EXPERIENCE}
+  \resumeSubHeadingListStart
+  \resumeSubheadingExp
+      {Stony Brook University - Visiting Scholar}{June 2026 -- Present}
+
+    \vspace{-6pt}
+    \textbf{Under Prof. Fusheng Wang} \hfill {Remote, USA}
+    \vspace{-4pt}
+      \resumeItemListStart
+        \resumeItem{Designing RAG evaluation experiments on spatial and geographic data, comparing chunking and embedding configurations with Chain-of-Thought prompting to improve multi-step spatial reasoning accuracy}
+    \resumeItemListEnd
+
+  \resumeSubheadingExp
+      {EchoStar Corporation - Cloud Engineer Intern }{May 2025 -- Aug 2025}
+
+    \vspace{-6pt}
+    \textbf{Boost Mobile -- 5G Public Cloud Team} \hfill {Denver, CO}
+    \vspace{-4pt}
+      \resumeItemListStart
+        \resumeItem{Built AI agent workflows on AWS and IBM watsonx Orchestrate using its agent builder to automate multi-step network and compliance tasks, integrating tool-calling actions over REST APIs so engineers could resolve requests through natural language instead of manual lookups}
+        \resumeItem{Re-architected the RAG retrieval layer by migrating 500K+ embeddings from OpenSearch Serverless to Amazon S3 Vectors with Bedrock Titan v2 across 12K+ documents, cutting vector storage cost by ~60\% (~\$15K annualized) while sustaining ~750ms p95 latency for agent retrieval under multi-tenant access}
+        \resumeItem{Shipped production-grade AI-powered full-stack tooling in Python, Go, and TypeScript in AWS with REST APIs, PostgreSQL, and Docker through code reviews and CI, enabling self-service retrieval of 20K+ reports and cutting operational overhead by 70\%+}
+    \resumeItemListEnd
+
+     \resumeSubheadingExp
+      {Stony Brook University - Research Assistant}{Aug 2024 -- May 2026}
+
+    \vspace{-6pt}
+    \textbf{Under Prof. Robert Kelly} \hfill {Stony Brook, NY}
+    \vspace{-4pt}
+      \resumeItemListStart
+        \resumeItem{Built a distributed analytics platform with FastAPI, Python, PostgreSQL, and Redis running large-scale evaluation and data-processing workflows on Seawulf HPC, parallelizing analysis across large volumes of geographic data}
+        \resumeItem{Implemented graph and geometric algorithms for scientific analysis of large datasets using MPI-based parallel processing, validating correctness through testing across distributed compute nodes}
+        \resumeItem{Built interactive D3.js dashboards with JavaScript, HTML, and CSS for analysis and reporting of evaluation metrics, giving engineers a visual interface into large-scale processing results}
+        \resumeItem{Designed high-throughput gRPC and REST APIs with Git, CI/CD, and PostgreSQL-backed services to support backend and frontend teams}
+    \resumeItemListEnd
+  \resumeSubHeadingListEnd
+\vspace{0pt}
+%-----------PROJECTS-----------
+\section{\color{colorOption} PROJECTS}
+\resumeSubHeadingListStart
+\resumeSubheadingExp
+{Distributed Banking Application with Linear PBFT Consensus}{|Golang, Distributed Systems, GRPC, SQLite3}
+\resumeItemListStart
+    \resumeItem{Engineered a 7-node fault-tolerant banking system leveraging the PBFT consensus protocol, achieving latency below 80ms, and managing 500+ simultaneous transactions}
+    \resumeItem{Implemented full PBFT lifecycle (pre-prepare, prepare, commit, view-change) with authenticated RPC and signed messages, tolerating Byzantine faults (equivocation, invalid signatures, crash faults) while preserving safety and liveness guarantees}
+\resumeItemListEnd
+
+\resumeSubheadingExp
+{WebWeaveAI --- Intelligent RAG System}{|FastAPI, LangChain, LlamaIndex, Playwright, ChromaDB}
+\resumeItemListStart
+    \resumeItem{Built a scalable data platform that asynchronously crawls and indexes 10,000+ web pages into structured searchable datasets at sub-400ms query latency, supporting high-throughput retrieval over large-scale content}
+    \resumeItem{Designed modular ingestion and retrieval pipelines with multi-LLM support and hybrid vector storage, improving crawl coverage by 65\% while keeping the architecture extensible for new tools and data sources}
+\resumeItemListEnd
+
+\resumeSubheadingExp
+{Distributed Banking System (Multi-Paxos + 2PC)}{|Golang, Distributed Systems, gRPC, PostgreSQL}
+\resumeItemListStart
+    \resumeItem{Architected a 9-node (3-cluster) distributed system using Multi-Paxos with automated leader election and heartbeat failover, delivering strongly consistent ACID transactions sustaining 50+ TPS}
+    \resumeItem{Engineered cross-shard atomic transactions via Two-Phase Commit over Paxos-replicated phases with PostgreSQL-backed WAL durability and checkpointing, guaranteeing zero data loss and sub-2s recovery}
+\resumeItemListEnd
+
+\vspace{4pt}
+%-----------TECHNICAL SKILLS-----------
+\section{\color{colorOption} TECHNICAL SKILLS}
+ \begin{itemize}[leftmargin=0.15in, label={}]
+   \normalsize{\item{
+     \textit{\textbf{Programming}: Java, Python, Go, C++, TypeScript, JavaScript, SQL.} \\
+     \textit{\textbf{Databases}: PostgreSQL, MySQL, Oracle, DynamoDB, MongoDB, Redis, SQLite.} \\
+     \textit{\textbf{Cloud \& Distributed}: AWS, GCP, Docker, Kubernetes, Microservices, gRPC, REST, Multi-Paxos, PBFT.} \\
+     \textit{\textbf{AI \& Tools}: LLMs, RAG, GenAI Dev Tools, LangChain, PyTorch, Spring Boot, FastAPI, Node.js.}
+    }}\\
+    \textit{\textbf{Practices}: SDLC, Agile, CI/CD, Code Reviews, Debugging, Troubleshooting, Operational Excellence}
+  \end{itemize}
+
+\end{document}

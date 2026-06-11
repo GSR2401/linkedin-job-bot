@@ -1,0 +1,49 @@
+# LinkedIn Job Discovery Bot — Configuration
+# Edit this file to change search behavior. No code changes needed.
+
+search:
+  roles:
+    - "Software Engineer"
+    - "Backend Engineer"
+    - "Cloud Engineer"
+    - "AI Engineer"
+    - "Site Reliability Engineer"
+  experience_levels:
+    - entry_level   # LinkedIn code: 1
+    - associate     # LinkedIn code: 2
+  easy_apply_only: true
+  posted_within_hours: 24
+  radius_miles: 25
+
+locations:
+  - "New York, NY"
+  - "San Francisco, CA"
+  - "Seattle, WA"
+  - "Austin, TX"
+  - "Boston, MA"
+  - "Chicago, IL"
+  - "Los Angeles, CA"
+  - "Atlanta, GA"
+  - "Denver, CO"
+  - "Washington, DC"
+  - "Dallas, TX"
+  - "Phoenix, AZ"
+  - "San Jose, CA"
+  - "Portland, OR"
+  - "Nashville, TN"
+  - "Miami, FL"
+  - "Remote"
+
+scraper:
+  delay_min_seconds: 3
+  delay_max_seconds: 7
+  headless: true
+  max_pages_per_search: 2   # Each page = ~25 jobs. 2 pages = up to 50 per search.
+
+matching:
+  min_match_score: 2   # Minimum resume keywords matched in title+description to include a job
+
+google_sheets:
+  spreadsheet_id: "1MN1A4JUiKem_BUpnhNFOp3iQSOCXi8ZTmj1gV2manJs"
+  worksheet_name: "Jobs"
+  credentials_env_var: "GOOGLE_CREDENTIALS_JSON"

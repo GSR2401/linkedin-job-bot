@@ -1,0 +1,43 @@
+name: LinkedIn Job Discovery
+
+on:
+  schedule:
+    # 12:00 PM EDT (16:00 UTC), 4:00 PM EDT (20:00 UTC), 8:00 PM EDT (00:00 UTC next day)
+    - cron: '0 16 * * *'
+    - cron: '0 20 * * *'
+    - cron: '0 0 * * *'
+  workflow_dispatch:  # Allow manual trigger from GitHub Actions UI
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt
+
+      - name: Install Playwright browsers
+        run: playwright install chromium --with-deps
+
+      - name: Run job discovery
+        env:
+          GOOGLE_CREDENTIALS_JSON: ${{ secrets.GOOGLE_CREDENTIALS_JSON }}
+        run: python src/main.py
+
+      - name: Upload run log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: error-log-${{ github.run_id }}
+          path: '*.log'
+          if-no-files-found: ignore
