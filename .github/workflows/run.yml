@@ -28,8 +28,17 @@ jobs:
       - name: Install Python dependencies
         run: pip install -r requirements.txt
 
+      - name: Install system dependencies for Playwright (Ubuntu 24.04)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libasound2t64 libgbm1 libxkbcommon0 libnspr4 libnss3 \
+            libatk1.0-0t64 libatk-bridge2.0-0t64 libcups2t64 \
+            libxcomposite1 libxdamage1 libxfixes3 libxrandr2 \
+            libpango-1.0-0 libcairo2 libx11-xcb1 libxcb-dri3-0
+
       - name: Install Playwright browsers
-        run: playwright install chromium --with-deps
+        run: playwright install chromium
 
       - name: Run job discovery
         env:
