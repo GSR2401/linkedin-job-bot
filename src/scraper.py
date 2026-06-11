@@ -117,7 +117,10 @@ async def scrape_jobs(config: dict) -> List[Job]:
     posted_within = config["search"].get("posted_within_hours", 24)
 
     async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=headless)
+        browser = await p.chromium.launch(
+            headless=headless,
+            args=["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage"],
+        )
         context = await browser.new_context(
             user_agent=random.choice(USER_AGENTS),
             viewport={"width": 1280, "height": 800},
