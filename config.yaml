@@ -41,7 +41,7 @@ scraper:
   max_pages_per_search: 2   # Each page = ~25 jobs. 2 pages = up to 50 per search.
 
 matching:
-  min_match_score: 2   # Minimum resume keywords matched in title+description to include a job
+  min_match_score: 4   # Minimum weighted score to include a job (high=2pts, low=1pt per keyword)
 
 google_sheets:
   spreadsheet_id: "1MN1A4JUiKem_BUpnhNFOp3iQSOCXi8ZTmj1gV2manJs"
