@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LinkedIn_JobBot — Job Feed</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,500;0,600;0,700;1,600&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<div class="page">
+  <div class="column">
+    <header class="header">
+      <div class="header-title-block">
+        <div class="kicker">Job feed</div>
+        <div class="title-row">
+          <div class="wordmark">LinkedIn_JobBot</div>
+          <div class="counter" id="counter">0 of 0 jobs</div>
+        </div>
+      </div>
+      <div class="controls-row">
+        <button class="pill sort-pill" id="sortToggle" type="button">
+          <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.4">
+            <path d="M4 3v10M4 3L1.5 5.5M4 3l2.5 2.5M12 13V3M12 13l2.5-2.5M12 13l-2.5-2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span id="sortLabel">Score: High &rarr; Low</span>
+        </button>
+        <div class="date-filter-wrap">
+          <button class="pill date-chip" id="dateFilterChip" type="button">
+            <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.4">
+              <rect x="2" y="3" width="12" height="11" rx="1.5"/>
+              <path d="M2 6.5h12M5 1.5v3M11 1.5v3" stroke-linecap="round"/>
+            </svg>
+            <span id="dateFilterLabel">All time</span>
+            <svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M4 6l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <div class="popover-overlay" id="popoverOverlay" hidden></div>
+          <div class="date-popover" id="dateFilterPopover" hidden>
+            <div class="date-popover-options" id="dateFilterOptions"></div>
+            <div class="custom-range" id="customRange" hidden>
+              <input type="date" id="customStart" class="date-input">
+              <input type="date" id="customEnd" class="date-input">
+            </div>
+            <div class="clear-filtered-wrap" id="clearFilteredWrap" hidden>
+              <div class="popover-divider"></div>
+              <button class="danger-outline-btn" id="clearFilteredBtn" type="button"></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="job-list" id="jobList"></main>
+
+    <div class="empty-state" id="emptyQueue" hidden>
+      <svg viewBox="0 0 16 16" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.3" style="opacity:.5">
+        <circle cx="8" cy="8" r="6.5"/>
+        <path d="M5.5 8.2l1.7 1.7L10.7 6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <div class="empty-headline">Queue is empty</div>
+      <div class="empty-subtext">New matches will show up here once the scraper finds them.</div>
+    </div>
+
+    <div class="empty-state" id="emptyFiltered" hidden>
+      <div class="empty-headline">No jobs in this range</div>
+      <div class="empty-subtext">Try a wider date filter.</div>
+      <button class="pill reset-filter-btn" id="resetFilterBtn" type="button">Reset filter</button>
+    </div>
+
+    <div class="toast" id="toast" hidden>
+      <span id="toastMessage"></span>
+      <button class="toast-undo" id="toastUndo" type="button">Undo</button>
+    </div>
+  </div>
+</div>
+<script src="/app.js"></script>
+</body>
+</html>

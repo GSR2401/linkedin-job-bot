@@ -150,6 +150,24 @@ To trigger a manual run: go to your repo on GitHub → **Actions** tab → **Lin
 
 ---
 
+## Web Dashboard (Job Feed Viewer)
+
+A local web UI for triaging scraped jobs — sort by match score, filter by date, open or delete listings, with swipe-to-delete on mobile and undo on every delete.
+
+```bash
+source venv/bin/activate
+export GOOGLE_CREDENTIALS_JSON='{"type":"service_account","project_id":"..."}'  # same as above
+python run_dashboard.py
+```
+
+Open **http://127.0.0.1:8000** in your browser.
+
+- Reads/writes the same Google Sheet the scraper populates — no separate database.
+- Deletes are soft: a row isn't actually removed from the sheet until ~5 seconds after you delete it, so "Undo" always works and never has to restore anything.
+- This is a local-only tool (the service account credentials never leave your machine) — it isn't deployed anywhere, unlike the scraper itself which runs on GitHub Actions.
+
+---
+
 ## Customizing
 
 All settings are in `config.yaml` — no code changes needed:

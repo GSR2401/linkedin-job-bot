@@ -77,6 +77,30 @@ def main():
     print(f"  Fetching descriptions for {len(candidates)} job(s)...")
 
     async def score_all(jobs):
+        concurrency = scraper_cfg.get("description_concurrency", 3)
+        queue: asyncio.Queue = asyncio.Queue()
+        for job in jobs:
+            queue.put_nowait(job)
+
+        scored_count = 0
+
+        async def worker(page):
+            nonlocal scored_count
+            while True:
+                try:
+                    job = queue.get_nowait()
+                except asyncio.QueueEmpty:
+                    return
+                desc = await fetch_description(page, job.url)
+                if requires_citizenship(desc):
+                    job.match_score = -1  # sentinel: skip this job
+                else:
+                    job.match_score, job.matched_skills = score_job(job.title, desc)
+                scored_count += 1
+                if (scored_count % 10) == 0 or scored_count == len(jobs):
+                    print(f"    Scored {scored_count}/{len(jobs)}...")
+                await asyncio.sleep(random.uniform(delay_min, delay_max))
+
         async with async_playwright() as p:
             browser = await p.chromium.launch(
                 headless=True,
@@ -87,18 +111,9 @@ def main():
                 locale="en-US",
             )
             await context.route("**/*.{png,jpg,jpeg,gif,svg,ico,woff,woff2,ttf}", lambda r: r.abort())
-            page = await context.new_page()
+            pages = [await context.new_page() for _ in range(concurrency)]
 
-            for i, job in enumerate(jobs, 1):
-                desc = await fetch_description(page, job.url)
-                if requires_citizenship(desc):
-                    job.match_score = -1  # sentinel: skip this job
-                else:
-                    job.match_score, job.matched_skills = score_job(job.title, desc)
-                if (i % 10) == 0 or i == len(jobs):
-                    print(f"    Scored {i}/{len(jobs)}...")
-                await asyncio.sleep(random.uniform(delay_min, delay_max))
-
+            await asyncio.gather(*(worker(p) for p in pages))
             await browser.close()
 
     asyncio.run(score_all(candidates))

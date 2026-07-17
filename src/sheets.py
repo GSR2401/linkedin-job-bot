@@ -11,6 +11,8 @@ from typing import List, Set
 import gspread
 from google.oauth2.service_account import Credentials
 
+from src.scraper import normalize_job_url
+
 SCOPES = [
     "https://www.googleapis.com/auth/spreadsheets",
 ]
@@ -117,6 +119,76 @@ def append_jobs(ws: gspread.Worksheet, jobs: list) -> int:
                 raise
 
     return 0
+
+
+def get_all_jobs(ws: gspread.Worksheet) -> List[dict]:
+    """Read every data row in the sheet and return one dict per job.
+
+    Skips rows with no URL (blank/malformed rows). URL is normalized the same
+    way the scraper/dedup logic does, since it's the natural unique key.
+    """
+    values = ws.get_all_values()
+    if len(values) <= 1:
+        return []
+
+    jobs = []
+    for row in values[1:]:
+        row = row + [""] * (len(HEADER_ROW) - len(row))  # pad short rows
+        url = normalize_job_url(row[4].strip())
+        if not url:
+            continue
+        try:
+            match_score = int(row[8])
+        except ValueError:
+            match_score = 0
+        jobs.append({
+            "date_found": row[0],
+            "title": row[1],
+            "company": row[2],
+            "location": row[3],
+            "url": url,
+            "easy_apply": row[5].strip().lower() == "yes",
+            "experience_level": row[6],
+            "role_category": row[7],
+            "match_score": match_score,
+            "matched_skills": row[9],
+            "status": row[10],
+            "notes": row[11],
+        })
+    return jobs
+
+
+def delete_job_by_url(ws: gspread.Worksheet, url: str) -> bool:
+    """Delete the single row matching `url`. Re-resolves the row index from a
+    fresh read every call — never relies on a cached row number, since indices
+    shift after any deletion. Returns True if a matching row was found and
+    deleted, False if the URL wasn't present (already gone / race)."""
+    target = normalize_job_url(url)
+    url_col = ws.col_values(URL_COL_INDEX + 1)  # 1-indexed
+    for i, cell in enumerate(url_col[1:], start=2):  # row 1 is header
+        if normalize_job_url(cell.strip()) == target:
+            ws.delete_rows(i)
+            return True
+    return False
+
+
+def delete_jobs_by_urls(ws: gspread.Worksheet, urls: List[str]) -> int:
+    """Delete every row whose URL is in `urls`. Resolves all matching row
+    indices from a single fresh read, then deletes in descending order so
+    earlier deletions don't shift the indices of rows still pending deletion.
+    Returns the count actually deleted (ignores URLs no longer present)."""
+    targets = {normalize_job_url(u) for u in urls}
+    if not targets:
+        return 0
+
+    url_col = ws.col_values(URL_COL_INDEX + 1)
+    matched_rows = [
+        i for i, cell in enumerate(url_col[1:], start=2)
+        if normalize_job_url(cell.strip()) in targets
+    ]
+    for row_idx in sorted(matched_rows, reverse=True):
+        ws.delete_rows(row_idx)
+    return len(matched_rows)
 
 
 def _format_header(ws: gspread.Worksheet):

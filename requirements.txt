@@ -3,3 +3,5 @@ gspread==6.1.2
 google-auth==2.29.0
 pyyaml==6.0.1
 beautifulsoup4==4.12.3
+fastapi==0.115.6
+uvicorn[standard]==0.32.1

@@ -5,9 +5,7 @@ search:
   roles:
     - "Software Engineer"
     - "Backend Engineer"
-    - "Cloud Engineer"
     - "AI Engineer"
-    - "Site Reliability Engineer"
   experience_levels:
     - entry_level   # LinkedIn code: 1
     - associate     # LinkedIn code: 2
@@ -39,6 +37,7 @@ scraper:
   delay_max_seconds: 7
   headless: true
   max_pages_per_search: 2   # Each page = ~25 jobs. 2 pages = up to 50 per search.
+  description_concurrency: 3   # Parallel browser tabs used to fetch job descriptions
 
 matching:
   min_match_score: 4   # Minimum weighted score to include a job (high=2pts, low=1pt per keyword)
