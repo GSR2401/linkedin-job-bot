@@ -257,9 +257,10 @@
         if (!dragging) return;
         dragging = false;
         const shouldOpen = lastDx <= -42;
-        rowEl.style.transform = "";
+        rowEl.style.transform = shouldOpen ? "translateX(-84px)" : "translateX(0)";
+        const changed = (state.swipeOpenId === jobId) !== shouldOpen;
         state.swipeOpenId = shouldOpen ? jobId : null;
-        render();
+        if (changed) render();
       });
     });
   }
