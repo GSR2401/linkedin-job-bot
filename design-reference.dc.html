@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,500;0,600;0,700;1,600&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    @keyframes jb-toast-in { from { opacity:0; transform: translate(-50%, 12px); } to { opacity:1; transform: translate(-50%, 0); } }
+    @keyframes jb-pop { from { opacity:0; transform: translateY(-6px) scale(.98); } to { opacity:1; transform: translateY(0) scale(1); } }
+    body { margin:0; -webkit-tap-highlight-color: transparent; }
+    * { box-sizing: border-box; }
+    a { color:#B4472E; }
+    a:hover { color:#8A3620; }
+  </style>
+</helmet>
+<div style="min-height:100vh; background:oklch(0.975 0.008 75); font-family:'Public Sans', sans-serif; color:oklch(0.22 0.02 50); display:flex; justify-content:center;">
+  <div style="width:100%; max-width:640px; min-height:100vh; background:oklch(0.99 0.004 75); border-left:1px solid oklch(0.88 0.014 70); border-right:1px solid oklch(0.88 0.014 70); position:relative; overflow-x:hidden; display:flex; flex-direction:column;">
+
+    <div style="position:sticky; top:0; z-index:20; background:oklch(0.99 0.004 75); border-bottom:1px solid oklch(0.88 0.014 70);">
+      <div style="padding:18px 20px 12px;">
+        <div style="font-size:11px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; color:{{ accentColor }}; margin-bottom:5px;">Job feed</div>
+        <div style="display:flex; align-items:baseline; justify-content:space-between; gap:12px;">
+          <div style="font-family:'Newsreader', serif; font-size:24px; font-weight:600; color:oklch(0.22 0.02 50); letter-spacing:-0.01em;">LinkedIn_JobBot</div>
+          <div style="font-size:13px; color:oklch(0.52 0.02 50); white-space:nowrap;">{{ shownCount }} of {{ totalCount }} jobs</div>
+        </div>
+      </div>
+
+      <div style="display:flex; align-items:center; gap:8px; padding:0 20px 14px;">
+        <button onClick="{{ toggleSort }}" style="display:flex; align-items:center; gap:6px; padding:8px 12px; border-radius:999px; border:1px solid oklch(0.88 0.014 70); background:oklch(0.975 0.008 75); color:oklch(0.22 0.02 50); font-size:13px; font-weight:600; font-family:inherit; cursor:pointer; white-space:nowrap;">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M5 3v10M5 3L2.5 5.5M5 3l2.5 2.5M11 13V3M11 13l2.5-2.5M11 13l-2.5-2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+          <span>Score: {{ sortLabel }}</span>
+        </button>
+
+        <div style="position:relative;">
+          <button onClick="{{ toggleDateFilter }}" style="display:flex; align-items:center; gap:6px; padding:8px 12px; border-radius:999px; border:1px solid {{ dateChipBorder }}; background:{{ dateChipBg }}; color:{{ dateChipColor }}; font-size:13px; font-weight:600; font-family:inherit; cursor:pointer; white-space:nowrap;">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="2.5" y="3.5" width="11" height="10" rx="1.5" stroke="currentColor" stroke-width="1.3"></rect><path d="M2.5 6.5h11M5.5 2v3M10.5 2v3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"></path></svg>
+            <span>{{ activeFilterLabel }}</span>
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+          </button>
+
+          <sc-if value="{{ dateFilterOpen }}" hint-placeholder-val="{{ false }}">
+            <div onClick="{{ closeDateFilter }}" style="position:fixed; inset:0; z-index:25;"></div>
+            <div style="position:absolute; top:calc(100% + 8px); left:0; width:min(250px, calc(100vw - 40px)); background:oklch(0.995 0.004 75); border:1px solid oklch(0.88 0.014 70); border-radius:14px; box-shadow:0 12px 32px oklch(0.2 0.02 50 / 0.16); z-index:30; padding:8px; animation:jb-pop .15s ease;">
+              <sc-for list="{{ filterOptions }}" as="opt" hint-placeholder-count="5">
+                <button onClick="{{ opt.onClick }}" style="width:100%; text-align:left; padding:9px 10px; border-radius:8px; border:none; background:{{ opt.bg }}; color:{{ opt.color }}; font-weight:{{ opt.weight }}; font-size:13.5px; font-family:inherit; cursor:pointer; display:flex; align-items:center; justify-content:space-between; margin-bottom:2px;">
+                  <span>{{ opt.label }}</span>
+                  <sc-if value="{{ opt.active }}" hint-placeholder-val="{{ false }}">
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3 3 7-7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                  </sc-if>
+                </button>
+              </sc-for>
+
+              <sc-if value="{{ isCustomFilter }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex; gap:6px; padding:6px 10px 4px;">
+                  <input type="date" value="{{ customStart }}" onChange="{{ onCustomStartChange }}" style="flex:1; min-width:0; font-size:12.5px; padding:6px; border-radius:6px; border:1px solid oklch(0.88 0.014 70); font-family:inherit;"></input>
+                  <input type="date" value="{{ customEnd }}" onChange="{{ onCustomEndChange }}" style="flex:1; min-width:0; font-size:12.5px; padding:6px; border-radius:6px; border:1px solid oklch(0.88 0.014 70); font-family:inherit;"></input>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ canClearFiltered }}" hint-placeholder-val="{{ false }}">
+                <div style="margin-top:6px; padding-top:8px; border-top:1px solid oklch(0.9 0.012 70);">
+                  <button onClick="{{ onClearFiltered }}" style="width:100%; padding:9px 10px; border-radius:8px; border:1px solid oklch(0.85 0.05 25); background:oklch(0.96 0.02 25); color:oklch(0.5 0.17 25); font-size:13px; font-weight:700; font-family:inherit; cursor:pointer;">
+                    Delete {{ filteredCount }} job(s) from {{ activeFilterLabel }}
+                  </button>
+                </div>
+              </sc-if>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+    </div>
+
+    <div style="flex:1; padding:14px 16px 100px;">
+      <sc-if value="{{ hasResults }}" hint-placeholder-val="{{ true }}">
+        <sc-for list="{{ groups }}" as="group" hint-placeholder-count="3">
+          <div style="margin-bottom:18px;">
+            <div style="display:flex; align-items:center; justify-content:space-between; padding:4px 4px 8px;">
+              <div style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:oklch(0.52 0.02 50);">{{ group.label }} · {{ group.count }}</div>
+              <button onClick="{{ group.onClearDate }}" style="display:flex; align-items:center; gap:4px; padding:4px 8px; border-radius:6px; border:none; background:transparent; color:oklch(0.6 0.02 50); font-size:11.5px; font-weight:600; font-family:inherit; cursor:pointer;">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 4.5h10M6.5 4.5V3.2c0-.4.3-.7.7-.7h1.6c.4 0 .7.3.7.7v1.3M4.2 4.5l.5 8c0 .6.5 1 1 1h4.6c.5 0 1-.4 1-1l.5-8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                <span>Clear day</span>
+              </button>
+            </div>
+
+            <sc-for list="{{ group.jobs }}" as="row" hint-placeholder-count="3">
+              <div style="position:relative; margin-bottom:8px; border-radius:14px;">
+                <div style="position:absolute; inset:0; border-radius:14px; background:oklch(0.55 0.19 25); display:flex; align-items:center; justify-content:flex-end; padding-right:22px;">
+                  <button onClick="{{ row.onDelete }}" style="background:none; border:none; padding:8px; cursor:pointer; display:flex; color:oklch(0.98 0.005 75);">
+                    <svg width="17" height="17" viewBox="0 0 16 16" fill="none"><path d="M3 4.5h10M6.5 4.5V3.2c0-.4.3-.7.7-.7h1.6c.4 0 .7.3.7.7v1.3M4.2 4.5l.5 8c0 .6.5 1 1 1h4.6c.5 0 1-.4 1-1l.5-8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                  </button>
+                </div>
+
+                <div ref="{{ row.setRef }}" onTouchStart="{{ row.onTouchStart }}" onTouchMove="{{ row.onTouchMove }}" onTouchEnd="{{ row.onTouchEnd }}" style="position:relative; background:oklch(0.995 0.004 75); border:1px solid oklch(0.9 0.012 70); border-radius:14px; transform:{{ row.rowTransform }}; opacity:{{ row.rowOpacity }}; transition:transform .22s ease, opacity .22s ease; touch-action:pan-y;">
+                  <div style="display:flex; align-items:center; gap:12px; padding:11px 6px 11px 12px; cursor:pointer;" onClick="{{ row.onOpen }}">
+                    <div style="flex-shrink:0; width:44px; height:44px; border-radius:12px; background:{{ row.scoreBg }}; display:flex; align-items:center; justify-content:center;">
+                      <span style="font-family:'Newsreader', serif; font-size:18px; font-weight:700; color:{{ row.scoreFg }}; font-variant-numeric:tabular-nums;">{{ row.score }}</span>
+                    </div>
+                    <div style="min-width:0; flex:1;">
+                      <div style="font-size:15px; font-weight:600; color:oklch(0.22 0.02 50); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ row.title }}</div>
+                      <div style="font-size:13px; color:oklch(0.52 0.02 50); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:2px;">{{ row.meta }}</div>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:2px; flex-shrink:0;">
+                      <button onClick="{{ row.onDelete }}" style="width:32px; height:32px; border-radius:8px; border:none; background:transparent; color:oklch(0.6 0.02 50); opacity:0.45; display:flex; align-items:center; justify-content:center; cursor:pointer;">
+                        <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M3 4.5h10M6.5 4.5V3.2c0-.4.3-.7.7-.7h1.6c.4 0 .7.3.7.7v1.3M4.2 4.5l.5 8c0 .6.5 1 1 1h4.6c.5 0 1-.4 1-1l.5-8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                      </button>
+                      <button onClick="{{ row.onToggleExpand }}" style="width:32px; height:32px; border-radius:8px; border:none; background:transparent; color:oklch(0.52 0.02 50); display:flex; align-items:center; justify-content:center; cursor:pointer;">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="transform:{{ row.chevronTransform }}; transition:transform .18s ease;"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                      </button>
+                    </div>
+                  </div>
+
+                  <sc-if value="{{ row.expanded }}" hint-placeholder-val="{{ false }}">
+                    <div style="padding:0 14px 14px 68px;">
+                      <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px;">
+                        <span style="background:oklch(0.96 0.01 70); color:oklch(0.4 0.02 50); font-size:12px; font-weight:600; padding:5px 10px; border-radius:999px; border:1px solid oklch(0.9 0.012 70);">{{ row.level }}</span>
+                        <span style="background:oklch(0.96 0.01 70); color:oklch(0.4 0.02 50); font-size:12px; font-weight:600; padding:5px 10px; border-radius:999px; border:1px solid oklch(0.9 0.012 70);">{{ row.role }}</span>
+                        <span style="background:oklch(0.96 0.01 70); color:oklch(0.4 0.02 50); font-size:12px; font-weight:600; padding:5px 10px; border-radius:999px; border:1px solid oklch(0.9 0.012 70);">Easy Apply: {{ row.easyApplyLabel }}</span>
+                        <span style="background:oklch(0.96 0.01 70); color:oklch(0.4 0.02 50); font-size:12px; font-weight:600; padding:5px 10px; border-radius:999px; border:1px solid oklch(0.9 0.012 70);">{{ row.fullDate }}</span>
+                      </div>
+
+                      <sc-if value="{{ row.hasSkills }}" hint-placeholder-val="{{ false }}">
+                        <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:oklch(0.55 0.02 50); margin-bottom:6px;">Matched skills</div>
+                        <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:14px;">
+                          <sc-for list="{{ row.skills }}" as="skill" hint-placeholder-count="3">
+                            <span style="background:oklch(0.97 0.02 85); color:oklch(0.4 0.06 70); font-size:12px; font-weight:600; padding:5px 10px; border-radius:8px; border:1px solid oklch(0.9 0.03 80);">{{ skill.label }}</span>
+                          </sc-for>
+                        </div>
+                      </sc-if>
+
+                      <div style="display:flex; gap:8px;">
+                        <button onClick="{{ row.onOpen }}" style="display:flex; align-items:center; gap:6px; background:{{ accentColor }}; color:oklch(0.98 0.005 75); border:none; border-radius:10px; padding:9px 14px; font-size:13.5px; font-weight:700; font-family:inherit; cursor:pointer;">
+                          Open job
+                          <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M7 3H3v10h10V9M9 3h4v4M13 3L7 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                        </button>
+                        <button onClick="{{ row.onDelete }}" style="background:oklch(0.97 0.02 25); color:oklch(0.5 0.17 25); border:1px solid oklch(0.85 0.05 25); border-radius:10px; padding:9px 14px; font-size:13.5px; font-weight:700; font-family:inherit; cursor:pointer;">
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  </sc-if>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-for>
+      </sc-if>
+
+      <sc-if value="{{ isQueueEmpty }}" hint-placeholder-val="{{ false }}">
+        <div style="text-align:center; padding:64px 24px; color:oklch(0.52 0.02 50);">
+          <svg width="40" height="40" viewBox="0 0 16 16" fill="none" style="margin:0 auto 14px; display:block; opacity:0.5;"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.3"></circle><path d="M5.5 8.2l1.8 1.8 3.2-3.6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+          <div style="font-family:'Newsreader', serif; font-size:18px; font-weight:600; color:oklch(0.3 0.02 50); margin-bottom:4px;">Queue is empty</div>
+          <div style="font-size:13.5px;">New matches will show up here once the scraper finds them.</div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isFilterEmpty }}" hint-placeholder-val="{{ false }}">
+        <div style="text-align:center; padding:64px 24px; color:oklch(0.52 0.02 50);">
+          <div style="font-family:'Newsreader', serif; font-size:18px; font-weight:600; color:oklch(0.3 0.02 50); margin-bottom:4px;">No jobs in this range</div>
+          <div style="font-size:13.5px; margin-bottom:14px;">Try a wider date filter.</div>
+          <button onClick="{{ onResetFilter }}" style="padding:8px 16px; border-radius:999px; border:1px solid oklch(0.88 0.014 70); background:oklch(0.995 0.004 75); color:oklch(0.22 0.02 50); font-size:13px; font-weight:600; font-family:inherit; cursor:pointer;">Reset filter</button>
+        </div>
+      </sc-if>
+    </div>
+
+    <sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
+      <div style="position:fixed; left:50%; bottom:22px; transform:translateX(-50%); z-index:40; display:flex; align-items:center; gap:14px; background:oklch(0.22 0.02 50); color:oklch(0.98 0.005 75); padding:12px 16px; border-radius:12px; box-shadow:0 12px 28px oklch(0.2 0.02 50 / 0.28); font-size:13.5px; max-width:calc(100vw - 32px); animation:jb-toast-in .2s ease;">
+        <span>{{ toastMessage }}</span>
+        <button onClick="{{ toastOnUndo }}" style="background:none; border:none; color:{{ accentColor }}; font-weight:700; font-size:13.5px; cursor:pointer; font-family:inherit; filter:brightness(1.6);">Undo</button>
+      </div>
+    </sc-if>
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;accent&quot;: {&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#B4472E&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;#B4472E&quot;,&quot;#2F6F5E&quot;,&quot;#9C6B2E&quot;,&quot;#3A4A6B&quot;]}, &quot;autoRemoveOnOpen&quot;: {&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;}, &quot;defaultSort&quot;: {&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;Highest score first&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;Highest score first&quot;,&quot;Lowest score first&quot;]}}">
+class Component extends DCLogic {
+  rowRefs = {};
+  state = {
+    jobs: this.buildJobs(),
+    sortDesc: (this.props.defaultSort ?? 'Highest score first') !== 'Lowest score first',
+    dateFilter: 'all',
+    dateFilterOpen: false,
+    customStart: '',
+    customEnd: '',
+    expandedId: null,
+    swipeOpenId: null,
+    removingId: null,
+    toast: null,
+  };
+
+  buildJobs() {
+    const now = new Date();
+    const day0 = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const at = (daysAgo, hh, mm) => { const d = new Date(day0); d.setDate(d.getDate() - daysAgo); d.setHours(hh, mm, 0, 0); return d; };
+    const raw = [
+      { daysAgo: 0, hh: 18, mm: 15, title: 'AI Engineer', company: 'CodeX Tech-IT LLC', location: 'United States', easyApply: true, level: 'Entry/Associate', role: 'AI Engineer', score: 46, skills: ['python ×3', 'ai ×2', 'rest api ×2'] },
+      { daysAgo: 0, hh: 18, mm: 10, title: 'Entry Level – Fullstack Developer, AI Integration', company: 'BeaconFire Inc.', location: 'New York, United States', easyApply: true, level: 'Entry/Associate', role: 'Backend Engineer', score: 39, skills: ['agile ×1', 'ai ×1', 'ci/cd ×1'] },
+      { daysAgo: 0, hh: 18, mm: 6, title: 'IT Software Engineer', company: 'Aditi Consulting', location: 'Chicago, IL', easyApply: true, level: 'Entry/Associate', role: 'Software Engineer', score: 33, skills: ['ci/cd ×1', 'cloud ×1', 'java ×1'] },
+      { daysAgo: 1, hh: 18, mm: 12, title: 'Engineer – Infrastructure as Code, Ansible, Terraform', company: 'Technical Talent, an Inc. 5000 Co.', location: 'Owings Mills, MD', easyApply: true, level: 'Entry/Associate', role: 'Cloud Engineer', score: 31, skills: ['terraform ×1', 'ai ×1', 'ci/cd ×1'] },
+      { daysAgo: 1, hh: 18, mm: 10, title: 'Full Stack Developer (Angular/Python/Nodejs/AWS)', company: 'Primary Talent Partners', location: 'Ohio, OH', easyApply: true, level: 'Entry/Associate', role: 'Backend Engineer', score: 29, skills: ['angular ×1', 'ai ×1', 'azure ×1'] },
+      { daysAgo: 1, hh: 18, mm: 8, title: 'Full Stack Automation Engineer', company: 'ECLARO', location: 'New York, NY', easyApply: true, level: 'Entry/Associate', role: 'Backend Engineer', score: 27, skills: ['automation ×1', 'ci/cd ×1', 'cloud ×1'] },
+      { daysAgo: 2, hh: 18, mm: 13, title: 'AI Data Scientist – Furman Lab', company: 'Institute for Research on Autonomy', location: 'Novato, CA', easyApply: true, level: 'Entry/Associate', role: 'AI Engineer', score: 25, skills: ['python ×2', 'rest ×2', 'retrieval ×1'] },
+      { daysAgo: 2, hh: 18, mm: 15, title: 'AI Engineer', company: 'ON.energy', location: 'Houston, TX', easyApply: true, level: 'Entry/Associate', role: 'AI Engineer', score: 24, skills: ['rest ×2', 'retrieval ×1', 'ai ×2'] },
+      { daysAgo: 2, hh: 18, mm: 15, title: 'Jr Data Scientist', company: 'Tech Consulting', location: 'Florida, United States', easyApply: true, level: 'Entry/Associate', role: 'AI Engineer', score: 24, skills: ['python ×1', 'sql ×1', 'ai ×1'] },
+      { daysAgo: 5, hh: 18, mm: 8, title: 'Software Engineer', company: 'Technical Talent, an Inc. 5000 Co.', location: 'Owings Mills, MD', easyApply: true, level: 'Entry/Associate', role: 'Software Engineer', score: 22, skills: ['java ×1', 'sql ×1', 'cloud ×1'] },
+      { daysAgo: 5, hh: 18, mm: 14, title: 'AI Developer', company: 'UgenticAI', location: 'Rockville, MD', easyApply: true, level: 'Entry/Associate', role: 'AI Engineer', score: 22, skills: ['ai ×2', 'python ×1', 'llm ×1'] },
+      { daysAgo: 5, hh: 18, mm: 12, title: 'DevOps Engineer', company: 'Aditi Consulting', location: 'Blue Ash, OH', easyApply: true, level: 'Entry/Associate', role: 'Cloud Engineer', score: 21, skills: ['ci/cd ×1', 'docker ×1', 'cloud ×1'] },
+      { daysAgo: 9, hh: 18, mm: 8, title: 'Software Engineer', company: 'AppCard, Inc.', location: 'New York, United States', easyApply: true, level: 'Entry/Associate', role: 'Software Engineer', score: 19, skills: ['java ×1', 'api ×1', 'sql ×1'] },
+      { daysAgo: 9, hh: 18, mm: 17, title: 'Site Reliability Engineer, Compute Platform', company: 'TikTok', location: 'San Jose, CA', easyApply: true, level: 'Entry/Associate', role: 'Reliability Engineer', score: 19, skills: ['kubernetes ×1', 'reliability ×1', 'cloud ×1'] },
+      { daysAgo: 9, hh: 18, mm: 13, title: 'Forward Deployment AI Engineer', company: 'Atera', location: 'New York, NY', easyApply: true, level: 'Entry/Associate', role: 'AI Engineer', score: 18, skills: ['ai ×1', 'deployment ×1', 'python ×1'] },
+    ];
+    return raw.map((r, i) => ({
+      id: 'job-' + i,
+      title: r.title, company: r.company, location: r.location,
+      easyApply: r.easyApply, level: r.level, role: r.role, score: r.score, skills: r.skills,
+      foundAt: at(r.daysAgo, r.hh, r.mm),
+      linkedinUrl: 'https://www.linkedin.com/jobs/view/' + (3900000000 + i * 137),
+    }));
+  }
+
+  dateFilterDefs() {
+    return [
+      { key: 'all', label: 'All time' },
+      { key: 'today', label: 'Today' },
+      { key: 'yesterday', label: 'Yesterday' },
+      { key: '7d', label: 'Last 7 days' },
+      { key: 'custom', label: 'Custom range' },
+    ];
+  }
+
+  sameDay(a, b) { return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate(); }
+
+  getScoreTier(score) { return score >= 35 ? 'high' : score >= 20 ? 'mid' : 'low'; }
+
+  tierColors(tier) {
+    const map = {
+      high: { bg: 'oklch(0.93 0.05 150)', text: 'oklch(0.4 0.12 150)' },
+      mid: { bg: 'oklch(0.93 0.06 85)', text: 'oklch(0.42 0.13 75)' },
+      low: { bg: 'oklch(0.93 0.01 55)', text: 'oklch(0.45 0.02 55)' },
+    };
+    return map[tier];
+  }
+
+  formatTime(d) { return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }); }
+
+  getFilteredJobs(day0) {
+    const jobs = this.state.jobs;
+    const f = this.state.dateFilter;
+    if (!f || f === 'all') return jobs;
+    if (f === 'today') return jobs.filter(j => this.sameDay(j.foundAt, day0));
+    if (f === 'yesterday') { const y = new Date(day0); y.setDate(y.getDate() - 1); return jobs.filter(j => this.sameDay(j.foundAt, y)); }
+    if (f === '7d') { const cutoff = new Date(day0); cutoff.setDate(cutoff.getDate() - 6); return jobs.filter(j => j.foundAt >= cutoff); }
+    if (f === 'custom') {
+      if (!this.state.customStart || !this.state.customEnd) return jobs;
+      const s = new Date(this.state.customStart + 'T00:00:00');
+      const e = new Date(this.state.customEnd + 'T23:59:59');
+      return jobs.filter(j => j.foundAt >= s && j.foundAt <= e);
+    }
+    return jobs;
+  }
+
+  toggleSort = () => this.setState(s => ({ sortDesc: !s.sortDesc }));
+  toggleDateFilter = () => this.setState(s => ({ dateFilterOpen: !s.dateFilterOpen }));
+  closeDateFilter = () => this.setState({ dateFilterOpen: false });
+  onCustomStartChange = (e) => this.setState({ customStart: e.target.value });
+  onCustomEndChange = (e) => this.setState({ customEnd: e.target.value });
+  onResetFilter = () => this.setState({ dateFilter: 'all', dateFilterOpen: false });
+
+  handleRowTap(job) {
+    if (this.state.swipeOpenId) { this.setState({ swipeOpenId: null }); return; }
+    this.handleOpenJob(job);
+  }
+
+  handleOpenJob(job) {
+    window.open(job.linkedinUrl, '_blank', 'noopener');
+    if (this.props.autoRemoveOnOpen ?? true) this.removeJob(job.id, 'opened');
+  }
+
+  removeJob(id, reason) {
+    const job = this.state.jobs.find(j => j.id === id);
+    if (!job) return;
+    this.setState({ removingId: id });
+    clearTimeout(this._removeTimer);
+    this._removeTimer = setTimeout(() => {
+      this.setState(s => ({
+        jobs: s.jobs.filter(j => j.id !== id),
+        removingId: null,
+        expandedId: s.expandedId === id ? null : s.expandedId,
+        swipeOpenId: s.swipeOpenId === id ? null : s.swipeOpenId,
+      }));
+      this.showToast(reason === 'opened' ? `Opened "${job.title}" and removed it` : `Deleted "${job.title}"`, () => {
+        clearTimeout(this._toastTimer);
+        this.setState(s => ({ jobs: [...s.jobs, job], toast: null }));
+      });
+    }, 220);
+  }
+
+  removeMultiple(ids, message) {
+    const removed = this.state.jobs.filter(j => ids.includes(j.id));
+    this.setState(s => ({ jobs: s.jobs.filter(j => !ids.includes(j.id)), dateFilterOpen: false }));
+    this.showToast(message, () => {
+      clearTimeout(this._toastTimer);
+      this.setState(s => ({ jobs: [...s.jobs, ...removed], toast: null }));
+    });
+  }
+
+  showToast(message, onUndo) {
+    clearTimeout(this._toastTimer);
+    this._toastTimer = setTimeout(() => { this.setState({ toast: null }); }, 5000);
+    this.setState({ toast: { message, onUndo } });
+  }
+
+  handleTouchStart(id, e) {
+    this._touchId = id;
+    this._touchX0 = e.touches[0].clientX;
+    this._lastDx = this.state.swipeOpenId === id ? -84 : 0;
+    this._dragging = true;
+  }
+  handleTouchMove(id, e) {
+    if (!this._dragging || this._touchId !== id) return;
+    const base = this.state.swipeOpenId === id ? -84 : 0;
+    let next = base + (e.touches[0].clientX - this._touchX0);
+    if (next > 0) next = 0;
+    if (next < -110) next = -110;
+    this._lastDx = next;
+    const el = this.rowRefs[id];
+    if (el) el.style.transform = `translateX(${next}px)`;
+  }
+  handleTouchEnd(id) {
+    if (!this._dragging || this._touchId !== id) return;
+    this._dragging = false;
+    const shouldOpen = this._lastDx <= -42;
+    const el = this.rowRefs[id];
+    if (el) el.style.transform = '';
+    this.setState({ swipeOpenId: shouldOpen ? id : null });
+  }
+
+  componentWillUnmount() {
+    clearTimeout(this._removeTimer);
+    clearTimeout(this._toastTimer);
+  }
+
+  buildRowVM(job) {
+    const tier = this.getScoreTier(job.score);
+    const colors = this.tierColors(tier);
+    const expanded = this.state.expandedId === job.id;
+    const isRemoving = this.state.removingId === job.id;
+    const swipeOpen = this.state.swipeOpenId === job.id;
+    return {
+      id: job.id,
+      title: job.title,
+      meta: job.company + ' · ' + job.location,
+      score: job.score,
+      scoreBg: colors.bg,
+      scoreFg: colors.text,
+      expanded,
+      chevronTransform: expanded ? 'rotate(180deg)' : 'rotate(0deg)',
+      rowTransform: isRemoving ? 'translateX(-110%)' : (swipeOpen ? 'translateX(-84px)' : 'translateX(0)'),
+      rowOpacity: isRemoving ? 0 : 1,
+      level: job.level,
+      role: job.role,
+      easyApplyLabel: job.easyApply ? 'Yes' : 'No',
+      skills: job.skills.map(s => ({ label: s })),
+      hasSkills: job.skills.length > 0,
+      fullDate: job.foundAt.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) + ' · ' + this.formatTime(job.foundAt),
+      onOpen: () => this.handleRowTap(job),
+      onToggleExpand: (e) => { e.stopPropagation(); this.setState(s => ({ expandedId: s.expandedId === job.id ? null : job.id })); },
+      onDelete: (e) => { if (e && e.stopPropagation) e.stopPropagation(); this.removeJob(job.id, 'deleted'); },
+      onTouchStart: (e) => this.handleTouchStart(job.id, e),
+      onTouchMove: (e) => this.handleTouchMove(job.id, e),
+      onTouchEnd: () => this.handleTouchEnd(job.id),
+      setRef: (el) => { this.rowRefs[job.id] = el; },
+    };
+  }
+
+  renderVals() {
+    const now = new Date();
+    const day0 = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const yest0 = new Date(day0); yest0.setDate(yest0.getDate() - 1);
+
+    const filtered = this.getFilteredJobs(day0);
+    const sorted = [...filtered].sort((a, b) => this.state.sortDesc ? b.score - a.score : a.score - b.score);
+
+    const groupMap = new Map();
+    sorted.forEach(j => {
+      const key = j.foundAt.toDateString();
+      if (!groupMap.has(key)) groupMap.set(key, []);
+      groupMap.get(key).push(j);
+    });
+    const groupKeys = [...groupMap.keys()].sort((a, b) => new Date(b) - new Date(a));
+    const groups = groupKeys.map(key => {
+      const jobsInGroup = groupMap.get(key);
+      const d = jobsInGroup[0].foundAt;
+      const d0 = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+      let label;
+      if (d0.getTime() === day0.getTime()) label = 'Today';
+      else if (d0.getTime() === yest0.getTime()) label = 'Yesterday';
+      else label = d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+      const ids = jobsInGroup.map(j => j.id);
+      return {
+        key,
+        label,
+        count: jobsInGroup.length,
+        onClearDate: () => this.removeMultiple(ids, `Deleted ${ids.length} job${ids.length > 1 ? 's' : ''} from ${label}`),
+        jobs: jobsInGroup.map(j => this.buildRowVM(j)),
+      };
+    });
+
+    const filterOptions = this.dateFilterDefs().map(o => ({
+      key: o.key,
+      label: o.label,
+      active: this.state.dateFilter === o.key,
+      bg: this.state.dateFilter === o.key ? 'oklch(0.96 0.01 70)' : 'transparent',
+      color: this.state.dateFilter === o.key ? 'oklch(0.22 0.02 50)' : 'oklch(0.52 0.02 50)',
+      weight: this.state.dateFilter === o.key ? '700' : '500',
+      onClick: () => this.setState({ dateFilter: o.key, dateFilterOpen: o.key === 'custom' }),
+    }));
+
+    const activeDef = this.dateFilterDefs().find(o => o.key === this.state.dateFilter) || this.dateFilterDefs()[0];
+    let activeFilterLabel = activeDef.label;
+    if (this.state.dateFilter === 'custom' && this.state.customStart && this.state.customEnd) {
+      const fmt = s => new Date(s + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      activeFilterLabel = fmt(this.state.customStart) + ' – ' + fmt(this.state.customEnd);
+    }
+
+    const filterActive = this.state.dateFilter !== 'all';
+    const toast = this.state.toast;
+
+    return {
+      accentColor: this.props.accent ?? '#B4472E',
+      totalCount: this.state.jobs.length,
+      shownCount: sorted.length,
+      hasResults: sorted.length > 0,
+      isQueueEmpty: this.state.jobs.length === 0,
+      isFilterEmpty: this.state.jobs.length > 0 && sorted.length === 0,
+      groups,
+      sortLabel: this.state.sortDesc ? 'High \u2192 Low' : 'Low \u2192 High',
+      toggleSort: this.toggleSort,
+      dateFilterOpen: this.state.dateFilterOpen,
+      toggleDateFilter: this.toggleDateFilter,
+      closeDateFilter: this.closeDateFilter,
+      dateChipBg: filterActive ? 'oklch(0.96 0.01 70)' : 'oklch(0.975 0.008 75)',
+      dateChipBorder: filterActive ? 'oklch(0.75 0.02 50)' : 'oklch(0.88 0.014 70)',
+      dateChipColor: filterActive ? 'oklch(0.22 0.02 50)' : 'oklch(0.52 0.02 50)',
+      activeFilterLabel,
+      filterOptions,
+      isCustomFilter: this.state.dateFilter === 'custom',
+      customStart: this.state.customStart,
+      customEnd: this.state.customEnd,
+      onCustomStartChange: this.onCustomStartChange,
+      onCustomEndChange: this.onCustomEndChange,
+      canClearFiltered: filterActive && sorted.length > 0,
+      filteredCount: sorted.length,
+      onClearFiltered: () => this.removeMultiple(sorted.map(j => j.id), `Deleted ${sorted.length} job${sorted.length > 1 ? 's' : ''} from ${activeFilterLabel}`),
+      onResetFilter: this.onResetFilter,
+      hasToast: !!toast,
+      toastMessage: toast ? toast.message : '',
+      toastOnUndo: toast ? toast.onUndo : () => {},
+    };
+  }
+}
+
+</script>
+</body>
+</html>
