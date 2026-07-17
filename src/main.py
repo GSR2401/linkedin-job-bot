@@ -17,7 +17,7 @@ from src.config_loader import load_config
 from src.scraper import scrape_jobs, fetch_description
 from src.sheets import get_client, get_or_create_worksheet, get_existing_urls, append_jobs
 from src.dedup import filter_new_jobs
-from src.matcher import is_excluded_by_title, score_job, requires_citizenship
+from src.matcher import is_excluded_by_title, is_excluded_by_company, score_job, requires_citizenship
 from playwright.async_api import async_playwright
 
 
@@ -69,8 +69,11 @@ def main():
 
     print(f"\nScoring jobs against resume (min score: {min_score})...")
     title_excluded = sum(1 for j in new_jobs if is_excluded_by_title(j.title))
-    candidates = [j for j in new_jobs if not is_excluded_by_title(j.title)]
+    after_title = [j for j in new_jobs if not is_excluded_by_title(j.title)]
+    company_excluded = sum(1 for j in after_title if is_excluded_by_company(j.company))
+    candidates = [j for j in after_title if not is_excluded_by_company(j.company)]
     print(f"  {title_excluded} job(s) excluded by title (iOS/Android/.NET/etc.)")
+    print(f"  {company_excluded} job(s) excluded by company (staffing/recruiting/platform/generic)")
     print(f"  Fetching descriptions for {len(candidates)} job(s)...")
 
     async def score_all(jobs):
@@ -122,6 +125,7 @@ def main():
     print(f"  Raw jobs found    : {len(raw_jobs)}")
     print(f"  Dupes skipped     : {len(raw_jobs) - len(new_jobs)}")
     print(f"  Title excluded    : {title_excluded}")
+    print(f"  Company excluded  : {company_excluded}")
     print(f"  Citizenship skip  : {citizenship_filtered}")
     print(f"  Low score filtered: {low_score}")
     print(f"  New jobs added    : {len(matched_jobs)}")
